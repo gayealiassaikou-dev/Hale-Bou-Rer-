@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes publications - Halé Bou Rér</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<button onclick="window.location.href='/'" class="btn-retour">
+←
+</button>
+
+<style>
+body {
+    background: #F7F5F0;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+.btn-retour {
+    position: fixed;
+    top: -10px;
+    left: -8px;
+    width: auto;
+    height: auto;
+    border: none;
+    background: transparent;
+    color: #1B5E20;
+    font-size: 76px;
+    font-weight: 300;
+    box-shadow: none;
+    cursor: pointer;
+    z-index: 999;
+    line-height: 1;
+}
+.page-mes-pubs {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 96px 20px 40px 20px;
+}
+.titre-mes-pubs {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: #1B5E20;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.carte-pub {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.badge-statut {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 14px;
+}
+.badge-trouve { background: #E6F4EA; color: #1B5E20; }
+.badge-perdu { background: #FDF1E0; color: #B9700E; }
+.carte-pub p { font-size: 16px; color: #1A1A1A; margin: 8px 0; line-height: 1.5; }
+.actions-pub {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+.actions-pub form {
+    margin: 0;
+}
+.actions-pub button {
+    border: none;
+    padding: 13px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+</style>
+
+<div class="page-mes-pubs">
+<h1 class="titre-mes-pubs">📁 Mes publications</h1>
+
+{% if not publications %}
+<p style="text-align:center; margin-top:30px;">Vous n'avez encore publié aucun signalement.</p>
+{% endif %}
+
+{% for signalement in publications %}
+
+<div class="carte-pub">
+
+{% if signalement["type"] == "trouve" %}
+<span class="badge-statut badge-trouve">🟢 Enfant trouvé</span>
+{% else %}
+<span class="badge-statut badge-perdu">🟠 Enfant perdu</span>
+{% endif %}
+
+{% if signalement["photo"] %}
+<div style="text-align:center; margin-bottom:15px;">
+    <img src="/uploads/{{ signalement['photo'] }}"
+         style="width:100%; max-width:380px; border-radius:20px; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
+</div>
+{% endif %}
+
+{% if signalement["prenom"] %}<p><b>👤 Prénom :</b> {{ signalement["prenom"] }}</p>{% endif %}
+<p><b>📍 Zone :</b> {{ signalement["zone"] }}</p>
+<p><b>📝 Description :</b><br>{{ signalement["description"] }}</p>
+<p><b>📅 Date :</b> {{ signalement["date_creation"] }}</p>
+<p><b>Statut :</b> {{ signalement["statut"] }}</p>
+
+<div class="actions-pub">
+<a href="/detail/{{ signalement['id'] }}" style="display:block;">
+<button type="button" style="background:#1976D2;">
+👁 Voir les détails
+</button>
+</a>
+<a href="/modifier/{{ signalement['id'] }}" style="display:block;">
+<button type="button" style="background:#E8A33D;">
+✏️ Modifier
+</button>
+</a>
+<form method="POST" action="/supprimer/{{ signalement['id'] }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette publication ?');">
+<button type="submit" style="background:#C0392B;">
+🗑 Supprimer
+</button>
+</form>
+{% if signalement["type"] == "perdu" %}
+<form method="POST" action="/marquer-retrouve/{{ signalement['id'] }}" onsubmit="return confirm('Confirmer que cet enfant a été retrouvé ?');">
+<button type="submit" style="background:#1B5E20;">
+✅ Marquer comme retrouvé
+</button>
+</form>
+{% endif %}
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+<br>
+<a href="/">⬅ Retour à l'accueil</a>
+
+</body>
+</html>

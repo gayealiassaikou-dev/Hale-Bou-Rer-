@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes conversations - Halé Bou Rér</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<button onclick="window.location.href='/'" class="btn-retour">
+←
+</button>
+
+<style>
+body {
+    background: #F7F5F0;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+.btn-retour {
+    position: fixed;
+    top: -10px;
+    left: -8px;
+    width: auto;
+    height: auto;
+    border: none;
+    background: transparent;
+    color: #1B5E20;
+    font-size: 76px;
+    font-weight: 300;
+    box-shadow: none;
+    cursor: pointer;
+    z-index: 999;
+    line-height: 1;
+}
+.page-conversations {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 96px 20px 40px 20px;
+}
+.titre-conversations {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: #1B5E20;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.carte-conversation {
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    position: relative;
+}
+.avatar-conv {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #E8A33D;
+}
+.avatar-conv-placeholder {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #1B5E20;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+.infos-conv {
+    flex: 1;
+    min-width: 0;
+}
+.nom-conv {
+    font-weight: 700;
+    font-size: 16px;
+    color: #1A1A1A;
+    margin: 0 0 4px 0;
+}
+.dernier-msg-conv {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.badge-non-lu {
+    background: #C0392B;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+}
+</style>
+
+<div class="page-conversations">
+<h1 class="titre-conversations">💬 Mes conversations</h1>
+
+{% if not conversations %}
+<p style="text-align:center; margin-top:30px;">Vous n'avez encore aucune conversation.</p>
+{% endif %}
+
+{% for conv in conversations %}
+<a href="/contacter/{{ conv['signalement_id'] }}" class="carte-conversation">
+
+{% if conv["photo"] %}
+<img src="/uploads/{{ conv['photo'] }}" class="avatar-conv">
+{% else %}
+<div class="avatar-conv-placeholder">👤</div>
+{% endif %}
+
+<div class="infos-conv">
+<p class="nom-conv">{{ conv["prenom"] if conv["prenom"] else "Signalement" }} — {{ conv["ville"] }}</p>
+<p class="dernier-msg-conv">{{ conv["dernier_contenu"] if conv["dernier_contenu"] else "Aucun message pour l'instant" }}</p>
+</div>
+
+{% if conv["non_lus"] and conv["non_lus"] > 0 %}
+<span class="badge-non-lu">{{ conv["non_lus"] }}</span>
+{% endif %}
+
+</a>
+{% endfor %}
+
+</div>
+<br>
+<a href="/">⬅ Retour à l'accueil</a>
+
+</body>
+</html>

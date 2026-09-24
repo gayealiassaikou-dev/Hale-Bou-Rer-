@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Détail du signalement</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+.flash-message {
+    background: #2E7D32;
+    color: white;
+    padding: 12px;
+    margin: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+</style>
+
+</head>
+<body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+
+
+<div style="max-width:700px;margin:70px auto;padding:20px;">
+
+{% if signalement[2] %}
+<img src="/uploads/{{ signalement[2] }}" style="width:100%;border-radius:20px;">
+{% endif %}
+
+<h2>
+{% if signalement[1]=="perdu" %}
+🟠 Enfant perdu
+{% else %}
+🟢 Enfant trouvé
+{% endif %}
+</h2>
+
+<p><b>👤 Prénom :</b> {{ signalement[10] }}</p>
+<p><b>🎂 Âge :</b> {{ signalement[11] }}</p>
+<p><b>⚧ Sexe :</b> {{ signalement[12] }}</p>
+<p><b>🏙️ Ville :</b> {{ signalement[13] }}</p>
+<p><b>📍 Zone :</b> {{ signalement[3] }}</p>
+<p><b>📝 Description :</b><br>{{ signalement[4] }}</p>
+<p><b>📅 Date :</b> {{ signalement[6] }}</p>
+
+
+{% if signalement[8] and signalement[9] %}
+
+<h3>📍 Localisation</h3>
+
+<div id="carte" style="height:300px;border-radius:15px;"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+var carte = L.map('carte').setView(
+    [{{ signalement[8] }}, {{ signalement[9] }}], 
+    15
+);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+}).addTo(carte);
+
+L.marker([
+    {{ signalement[8] }},
+    {{ signalement[9] }}
+]).addTo(carte);
+
+</script>
+
+{% endif %}
+
+
+<br><br>
+
+{% if session.get("user_id") and signalement[14] and session.get("user_id") != signalement[14] %}
+<a href="/contacter/{{ signalement[0] }}" style="display:inline-block;background:#1B5E20;color:white;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:16px;margin-right:10px;">
+💬 Contacter
+</a>
+{% endif %}
+
+<button onclick="partagerSignalement()" style="background:#2E7D32;color:white;border:none;padding:12px 20px;border-radius:10px;font-size:16px;cursor:pointer;">
+📤 Partager ce signalement
+</button>
+
+<form action="/signaler-abus/{{ signalement[0] }}" method="POST" style="display:inline;margin-left:10px;" onsubmit="return confirm('Signaler ce post comme suspect ou abusif ?');">
+<button type="submit" style="background:#c62828;color:white;border:none;padding:12px 20px;border-radius:10px;font-size:16px;cursor:pointer;">
+🚩 Signaler ce post
+</button>
+</form>
+
+<script>
+function partagerSignalement() {
+    if (navigator.share) {
+        navigator.share({
+            title: "Halé Bou Rér - Signalement",
+            text: "Aidez-nous à retrouver cet enfant.",
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Lien copié. Vous pouvez maintenant le partager.");
+    }
+}
+</script>
+
+</div>
+
+</body>
+</html>
